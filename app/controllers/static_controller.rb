@@ -11,4 +11,9 @@ class StaticController < ApplicationController
     @text = params[:param]
     render plain: @text
   end
+
+  def ajax_update3
+    @text = params[:ajax_data3]
+    render plain: @text
+  end
 end

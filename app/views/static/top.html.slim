@@ -13,8 +13,15 @@ p Find me in app/views/static/top.html.slim
 = text_field_tag 'static[ajax_data2]'
 = button_tag 'Post Ajax', id: 'btn2'
 
+#ajax-test3 Ajax: form送信はRails、受信以降はJS
+#ajax-request3
+  = form_tag(static_ajax_update3_path, method: :post, remote: true, id: 'test')
+    = text_field_tag :ajax_data3
+    = submit_tag 'Post Ajax'
+
 javascript:
-  $('#jquery-test1').css('color', 'red');
+
+  // Ajax: ほぼJS 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn2').addEventListener('click', () => {
       var result = document.getElementById('ajax-test2');
@@ -32,3 +39,12 @@ javascript:
 
     }, false);
   }, false);
+
+  // Ajax: form送信はRails、受信以降はJS
+  document.addEventListener('DOMContentLoaded', () => {
+    // 'ajax:success' というイベント名でなぜいけるのかは不明；
+    document.getElementById('test').addEventListener('ajax:success', (e) => {
+      var result = document.getElementById('ajax-test3');
+      result.textContent = e.detail[0];
+    });
+  });
