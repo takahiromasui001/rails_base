@@ -1,3 +1,5 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  get 'static/top'
+  post 'static/ajax_update', to: 'static#ajax_update'
+  get 'static/ajax_update2/:param', to: 'static#ajax_update2'
 end

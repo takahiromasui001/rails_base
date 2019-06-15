@@ -1,0 +1,36 @@
+h1 Static#top
+p Find me in app/views/static/top.html.slim
+
+#ajax-test1 Ajax: Rails依存
+
+#ajax-request1
+  = form_tag(static_ajax_update_path, method: :post, remote: true)
+    = text_field_tag :data
+    = submit_tag 'Post Ajax'
+
+#ajax-test2 Ajax: ほぼJS
+
+= text_field_tag 'static[ajax_data2]'
+= button_tag 'Post Ajax', id: 'btn2'
+
+javascript:
+  $('#jquery-test1').css('color', 'red');
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btn2').addEventListener('click', function() {
+      var result = document.getElementById('ajax-test2');
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            result.textContent = xhr.responseText;
+          } else {
+            result.textContent = 'サーバエラーが発生しました。';
+          }
+        } else {
+          result.textContent = '通信中...'
+        }
+      }
+      xhr.open('GET', '/static/ajax_update2/' + encodeURIComponent(document.getElementById('static_ajax_data2').value), true);
+      xhr.send(null);
+    }, false);
+  }, false);
