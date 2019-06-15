@@ -24,7 +24,11 @@ javascript:
       xhr.addEventListener('load', () => { result.textContent = xhr.responseText; });
       xhr.addEventListener('error', () => { result.textContent = 'サーバエラーが発生しました。'; });
 
-      xhr.open('GET', '/static/ajax_update2/' + encodeURIComponent(document.getElementById('static_ajax_data2').value), true);
-      xhr.send(null);
+      // xhr.open('GET', '/static/ajax_update2/' + encodeURIComponent(document.getElementById('static_ajax_data2').value), true);
+      // xhr.send(null);
+      xhr.open('POST', '/static/ajax_update2/', true);
+      xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+      xhr.send('param=' + encodeURIComponent(document.getElementById('static_ajax_data2').value));
+
     }, false);
   }, false);
