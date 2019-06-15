@@ -15,21 +15,15 @@ p Find me in app/views/static/top.html.slim
 
 javascript:
   $('#jquery-test1').css('color', 'red');
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btn2').addEventListener('click', function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btn2').addEventListener('click', () => {
       var result = document.getElementById('ajax-test2');
       var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            result.textContent = xhr.responseText;
-          } else {
-            result.textContent = 'サーバエラーが発生しました。';
-          }
-        } else {
-          result.textContent = '通信中...'
-        }
-      }
+    
+      xhr.addEventListener('loadstart', () => { result.textContent = '通信中...'; });
+      xhr.addEventListener('load', () => { result.textContent = xhr.responseText; });
+      xhr.addEventListener('error', () => { result.textContent = 'サーバエラーが発生しました。'; });
+
       xhr.open('GET', '/static/ajax_update2/' + encodeURIComponent(document.getElementById('static_ajax_data2').value), true);
       xhr.send(null);
     }, false);
