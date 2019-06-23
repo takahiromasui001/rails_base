@@ -1,50 +1,75 @@
 h1 Static#top
-p Find me in app/views/static/top.html.slim
 
-#ajax-test1 Ajax: Rails依存
+#ajax-test1 Ajax:
+= form_with url: static_ajax_update_path do |f|
+  = f.text_field :data
+  = f.submit 'Post Ajax' 
 
-#ajax-request1
-  = form_tag(static_ajax_update_path, method: :post, remote: true)
-    = text_field_tag :data
-    = submit_tag 'Post Ajax'
-
-#ajax-test2 Ajax: ほぼJS
-
+#ajax-test2 Ajax: ほぼJS(jQuery)
 = text_field_tag 'static[ajax_data2]'
 = button_tag 'Post Ajax', id: 'btn2'
 
 #ajax-test3 Ajax: form送信はRails、受信以降はJS
-#ajax-request3
-  = form_tag(static_ajax_update3_path, method: :post, remote: true, id: 'test')
-    = text_field_tag :ajax_data3
-    = submit_tag 'Post Ajax'
+= form_with url: static_ajax_update2_path, id: 'ajax-request-3' do |f|
+  = f.text_field :data
+  = f.submit 'Post Ajax'
+
+#ajax-test4 Ajax: ほぼJS(GET利用)
+= text_field_tag 'static[ajax_data4]'
+= button_tag 'Post Ajax', id: 'btn4'
 
 javascript:
+  // Ajax: form送信はRails、受信以降はJS
+  $( () => {
+    $('#ajax-request-3').on('ajax:success', (e) => {
+      const result = $('#ajax-test3');
+      result.text(e.detail[0]);
+    });
+  });
+
+  // Ajax ほぼJS(jQuery)
+  $(document).ready( () => {
+    $('#btn2').on('click', (e) => {
+      e.preventDefault();
+
+      const param = $('#static_ajax_data2').val();
+
+      // CSRFトークンを取得＆セット
+      $.ajaxPrefilter( (options, originalOptions, jqXHR) => {
+          if (!options.crossDomain) {
+            const token = $('meta[name="csrf-token"]').attr('content');
+            if (token) {
+                 return jqXHR.setRequestHeader('X-CSRF-Token', token);
+             }
+          }
+          debugger
+      });
+
+      $.ajax({
+        url: `/static/ajax_update2`,
+        type: 'POST',
+        data: {
+          data: param
+        }
+      })
+      .done( (data, textStatus, jqXHR) => {
+        var result = $('#ajax-test2');
+        result.text(data);
+      });
+    });
+  });
 
   // Ajax: ほぼJS 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btn2').addEventListener('click', () => {
-      var result = document.getElementById('ajax-test2');
+    document.getElementById('btn4').addEventListener('click', () => {
+      var result = document.getElementById('ajax-test4');
       var xhr = new XMLHttpRequest();
     
       xhr.addEventListener('loadstart', () => { result.textContent = '通信中...'; });
       xhr.addEventListener('load', () => { result.textContent = xhr.responseText; });
       xhr.addEventListener('error', () => { result.textContent = 'サーバエラーが発生しました。'; });
 
-      // xhr.open('GET', '/static/ajax_update2/' + encodeURIComponent(document.getElementById('static_ajax_data2').value), true);
-      // xhr.send(null);
-      xhr.open('POST', '/static/ajax_update2/', true);
-      xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-      xhr.send('param=' + encodeURIComponent(document.getElementById('static_ajax_data2').value));
-
+      xhr.open('GET', '/static/ajax_update4/' + encodeURIComponent(document.getElementById('static_ajax_data4').value), true);
+      xhr.send(null);
     }, false);
   }, false);
-
-  // Ajax: form送信はRails、受信以降はJS
-  document.addEventListener('DOMContentLoaded', () => {
-    // 'ajax:success' というイベント名でなぜいけるのかは不明；
-    document.getElementById('test').addEventListener('ajax:success', (e) => {
-      var result = document.getElementById('ajax-test3');
-      result.textContent = e.detail[0];
-    });
-  });

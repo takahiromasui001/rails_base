@@ -8,12 +8,7 @@ class StaticController < ApplicationController
   end
 
   def ajax_update2
-    @text = params[:param]
-    render plain: @text
-  end
-
-  def ajax_update3
-    @text = params[:ajax_data3]
+    @text = params[:data]
     render plain: @text
   end
 end
